@@ -53,7 +53,7 @@ $(BUSYBOX_CONFIG):
 busybox_prepare: $(BUSYBOX_CONFIG)
 LOCAL_MODULE := busybox_prepare
 LOCAL_MODULE_TAGS := eng debug
-include $(BUILD_STATIC_LIBRARY)
+#include $(BUILD_STATIC_LIBRARY)
 
 
 LOCAL_PATH := $(BB_PATH)
@@ -68,12 +68,13 @@ BUSYBOX_SRC_FILES = $(shell cat $(BB_PATH)/busybox-$(BUSYBOX_CONFIG).sources) \
 
 ifeq ($(TARGET_ARCH),arm)
 	BUSYBOX_SRC_FILES += \
-	android/libc/arch-arm/syscalls/adjtimex.S \
-	android/libc/arch-arm/syscalls/getsid.S \
-	android/libc/arch-arm/syscalls/stime.S \
 	android/libc/arch-arm/syscalls/swapon.S \
 	android/libc/arch-arm/syscalls/swapoff.S \
 	android/libc/arch-arm/syscalls/sysinfo.S
+	#android/libc/arch-arm/syscalls/adjtimex.S \
+	#android/libc/arch-arm/syscalls/getsid.S \
+	#android/libc/arch-arm/syscalls/stime.S \
+
 endif
 
 ifeq ($(TARGET_ARCH),mips)
@@ -129,7 +130,7 @@ LOCAL_CFLAGS += \
 LOCAL_MODULE := libbusybox
 LOCAL_MODULE_TAGS := eng debug
 LOCAL_STATIC_LIBRARIES := libcutils libc libm
-$(LOCAL_MODULE): busybox_prepare
+#$(LOCAL_MODULE): busybox_prepare
 include $(BUILD_STATIC_LIBRARY)
 
 
@@ -151,12 +152,12 @@ LOCAL_MODULE_TAGS := eng debug
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
 LOCAL_SHARED_LIBRARIES := libc libcutils libm
 LOCAL_STATIC_LIBRARIES := libclearsilverregex libuclibcrpc
-$(LOCAL_MODULE): busybox_prepare
+#$(LOCAL_MODULE): busybox_prepare
 include $(BUILD_EXECUTABLE)
 
 BUSYBOX_LINKS := $(shell cat $(BB_PATH)/busybox-$(BUSYBOX_CONFIG).links)
 # nc is provided by external/netcat
-exclude := nc
+exclude := nc which
 SYMLINKS := $(addprefix $(TARGET_OUT_OPTIONAL_EXECUTABLES)/,$(filter-out $(exclude),$(notdir $(BUSYBOX_LINKS))))
 $(SYMLINKS): BUSYBOX_BINARY := $(LOCAL_MODULE)
 $(SYMLINKS): $(LOCAL_INSTALLED_MODULE)
@@ -199,5 +200,5 @@ LOCAL_STATIC_LIBRARIES := libclearsilverregex libc libcutils libm libuclibcrpc
 LOCAL_MODULE_CLASS := UTILITY_EXECUTABLES
 LOCAL_MODULE_PATH := $(PRODUCT_OUT)/utilities
 LOCAL_UNSTRIPPED_PATH := $(PRODUCT_OUT)/symbols/utilities
-$(LOCAL_MODULE): busybox_prepare
+#$(LOCAL_MODULE): busybox_prepare
 include $(BUILD_EXECUTABLE)

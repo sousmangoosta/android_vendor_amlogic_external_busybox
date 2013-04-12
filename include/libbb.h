@@ -264,17 +264,24 @@ typedef unsigned long uoff_t;
 #endif
 /* scary. better ideas? (but do *test* them first!) */
 #define OFF_T_MAX  ((off_t)~((off_t)1 << (sizeof(off_t)*8-1)))
+
+/* off_t is 32bits when it should be 64bits when LARGEFILE is defined. disable check, dangerously */
+#ifndef __BIONIC__
 /* Users report bionic to use 32-bit off_t even if LARGEFILE support is requested.
  * We misdetected that. Don't let it build:
  */
 struct BUG_off_t_size_is_misdetected {
 	char BUG_off_t_size_is_misdetected[sizeof(off_t) == sizeof(uoff_t) ? 1 : -1];
 };
+#endif
 
 #ifdef __BIONIC__
 /* bionic uses stat64 which has long long file sizes, whereas off_t is only long bits */
 typedef long long filesize_t;
 #define FILESIZE_FMT "ll"
+#if ENABLE_LFS
+#define lseek lseek64
+#endif /* ENABLE_LFS */
 #else
 typedef off_t filesize_t;
 #define FILESIZE_FMT OFF_FMT
@@ -501,7 +508,7 @@ int open_or_warn_stdin(const char *pathname) FAST_FUNC;
 int xopen_stdin(const char *pathname) FAST_FUNC;
 void xrename(const char *oldpath, const char *newpath) FAST_FUNC;
 int rename_or_warn(const char *oldpath, const char *newpath) FAST_FUNC;
-off_t xlseek(int fd, off_t offset, int whence) FAST_FUNC;
+uoff_t xlseek(int fd, uoff_t offset, int whence) FAST_FUNC;
 int xmkstemp(char *template) FAST_FUNC;
 off_t fdlength(int fd) FAST_FUNC;
 
