@@ -68,7 +68,6 @@
 /bin/dc
 /bin/dd
 /bin/deallocvt
-/sbin/depmod
 /sbin/devmem
 /bin/df
 /bin/diff
@@ -87,8 +86,6 @@
 /sbin/fbsplash
 /sbin/fdisk
 /bin/fgconsole
-/bin/fgrep
-/bin/find
 /bin/findfs
 /sbin/flash_lock
 /sbin/flash_unlock
@@ -105,14 +102,11 @@
 /bin/getenforce
 /bin/getopt
 /bin/getsebool
-/bin/grep
-/bin/groups
 /bin/gunzip
 /bin/gzip
 /bin/head
 /bin/hexdump
 /sbin/hwclock
-/bin/id
 /sbin/ifconfig
 /sbin/inetd
 /bin/install
@@ -126,7 +120,6 @@
 /sbin/losetup
 /bin/ls
 /bin/lsattr
-/sbin/lsmod
 /bin/lspci
 /bin/lsusb
 /bin/lzcat
@@ -158,7 +151,6 @@
 /sbin/ntpd
 /bin/od
 /bin/openvt
-/bin/patch
 /bin/pgrep
 /bin/pidof
 /bin/pipe_progress
@@ -167,7 +159,6 @@
 /bin/printf
 /bin/ps
 /bin/pwd
-/bin/pwdx
 /bin/rdate
 /sbin/rdev
 /bin/readlink
@@ -176,7 +167,6 @@
 /bin/reset
 /bin/resize
 /sbin/restorecon
-/bin/rev
 /bin/rm
 /bin/rmdir
 /sbin/route
@@ -192,7 +182,6 @@
 /sbin/setfiles
 /bin/setkeycodes
 /sbin/setsebool
-/bin/setserial
 /bin/setsid
 /bin/sha1sum
 /bin/sha3sum
