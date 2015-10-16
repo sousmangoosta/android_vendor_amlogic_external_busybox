@@ -123,7 +123,7 @@ BUSYBOX_C_INCLUDES = \
 	bionic/libm \
 	libc/kernel/common \
 	external/libselinux/include \
-	external/libsepol/include \
+	external/selinux/libsepol/include \
 	$(BB_PATH)/android/regex \
 	$(BB_PATH)/android/librpc
 
@@ -235,7 +235,7 @@ LOCAL_MODULE := static_busybox
 LOCAL_MODULE_STEM := busybox
 LOCAL_MODULE_TAGS := optional
 LOCAL_STATIC_LIBRARIES := libclearsilverregex libc libcutils libm libuclibcrpc libselinux
-LOCAL_MODULE_CLASS := UTILITY_EXECUTABLES
+LOCAL_MODULE_CLASS := EXECUTABLES
 LOCAL_MODULE_PATH := $(PRODUCT_OUT)/utilities
 LOCAL_UNSTRIPPED_PATH := $(PRODUCT_OUT)/symbols/utilities
 #$(LOCAL_MODULE): busybox_prepare
