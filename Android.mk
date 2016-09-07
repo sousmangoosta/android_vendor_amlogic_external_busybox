@@ -1,3 +1,4 @@
+####busybox #######
 LOCAL_PATH := $(call my-dir)
 BB_PATH := $(LOCAL_PATH)
 
@@ -55,19 +56,19 @@ busybox_prepare_full := $(bb_gen)/full/.config
 $(busybox_prepare_full): $(BB_PATH)/busybox-full.config
 	@echo -e ${CL_YLW}"Prepare config for busybox binary"${CL_RST}
 	@rm -rf $(bb_gen)/full
-	@rm -f $(shell find $(abspath $(call intermediates-dir-for,EXECUTABLES,busybox)) -name "*.o")
+	@rm -f $(addsuffix /*.o, $(abspath $(call intermediates-dir-for,EXECUTABLES,busybox)))
 	@mkdir -p $(@D)
 	@cat $^ > $@ && echo "CONFIG_CROSS_COMPILER_PREFIX=\"$(BUSYBOX_CROSS_COMPILER_PREFIX)\"" >> $@
-	+make -C $(BB_PATH) prepare O=$(@D) $(BB_PREPARE_FLAGS)
+	$(MAKE) -C $(BB_PATH) prepare O=$(@D) $(BB_PREPARE_FLAGS)
 
 busybox_prepare_minimal := $(bb_gen)/minimal/.config
 $(busybox_prepare_minimal): $(BB_PATH)/busybox-minimal.config
 	@echo -e ${CL_YLW}"Prepare config for libbusybox"${CL_RST}
 	@rm -rf $(bb_gen)/minimal
-	@rm -f $(shell find $(abspath $(call intermediates-dir-for,STATIC_LIBRARIES,libbusybox)) -name "*.o")
+	@rm -f $(addsuffix /*.o, $(abspath $(call intermediates-dir-for,STATIC_LIBRARIES,libbusybox)))
 	@mkdir -p $(@D)
 	@cat $^ > $@ && echo "CONFIG_CROSS_COMPILER_PREFIX=\"$(BUSYBOX_CROSS_COMPILER_PREFIX)\"" >> $@
-	+make -C $(BB_PATH) prepare O=$(@D) $(BB_PREPARE_FLAGS)
+	$(MAKE) -C $(BB_PATH) prepare O=$(@D) $(BB_PREPARE_FLAGS)
 
 KERNEL_MODULES_DIR ?= /system/lib/modules
 BUSYBOX_CONFIG := minimal full

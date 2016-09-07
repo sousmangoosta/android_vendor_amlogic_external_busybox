@@ -37,3 +37,7 @@ Config.in
 core
 .gdb_history
 .gdbinit
+
+#ctags
+tags
+ctags
