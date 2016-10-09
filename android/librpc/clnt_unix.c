@@ -49,6 +49,11 @@
 #define __FORCE_GLIBC
 #include <features.h>
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <fcntl.h>
+
 #include <netdb.h>
 #include <errno.h>
 #include <stdio.h>
