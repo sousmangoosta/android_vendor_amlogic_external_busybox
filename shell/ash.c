@@ -187,8 +187,8 @@
 //config:
 
 //applet:IF_ASH(APPLET(ash, BB_DIR_BIN, BB_SUID_DROP))
-//applet:IF_FEATURE_SH_IS_ASH(APPLET_ODDNAME(sh, ash, BB_DIR_BIN, BB_SUID_DROP, sh))
-//applet:IF_FEATURE_BASH_IS_ASH(APPLET_ODDNAME(bash, ash, BB_DIR_BIN, BB_SUID_DROP, bash))
+//applet:IF_SH_IS_ASH(APPLET_ODDNAME(sh, ash, BB_DIR_BIN, BB_SUID_DROP, ash))
+//applet:IF_BASH_IS_ASH(APPLET_ODDNAME(bash, ash, BB_DIR_BIN, BB_SUID_DROP, ash))
 
 //kbuild:lib-$(CONFIG_ASH) += ash.o ash_ptr_hack.o shell_common.o
 //kbuild:lib-$(CONFIG_ASH_RANDOM_SUPPORT) += random.o
@@ -3738,7 +3738,7 @@ setjobctl(int on)
 			}
 			if (pgrp == getpgrp())
 				break;
-			killpg_busybox(0, SIGTTIN);
+			killpg(0, SIGTTIN);
 		}
 		initialpgrp = pgrp;
 
@@ -3851,7 +3851,7 @@ restartjob(struct job *jp, int mode)
 	pgid = jp->ps[0].ps_pid;
 	if (mode == FORK_FG)
 		xtcsetpgrp(ttyfd, pgid);
-	killpg_busybox(pgid, SIGCONT);
+	killpg(pgid, SIGCONT);
 	ps = jp->ps;
 	i = jp->nprocs;
 	do {
@@ -5902,7 +5902,7 @@ expbackq(union node *cmd, int quoted, int quotes)
  read:
 		if (in.fd < 0)
 			break;
-		i = nonblock_immune_read(in.fd, buf, sizeof(buf), /*loop_on_EINTR:*/ 1);
+		i = nonblock_immune_read(in.fd, buf, sizeof(buf));
 		TRACE(("expbackq: read returns %d\n", i));
 		if (i <= 0)
 			break;
@@ -6055,7 +6055,7 @@ argstr(char *p, int flags, struct strlist *var_str_list)
 		c = p[length];
 		if (c) {
 			if (!(c & 0x80)
-			IF_SH_MATH_SUPPORT(|| c == CTLENDARI)
+			IF_FEATURE_SH_MATH(|| c == CTLENDARI)
 			) {
 				/* c == '=' || c == ':' || c == CTLENDARI */
 				length++;
@@ -9637,7 +9637,7 @@ preadfd(void)
 #if ENABLE_FEATURE_EDITING
  retry:
 	if (!iflag || g_parsefile->pf_fd != STDIN_FILENO)
-		nr = nonblock_immune_read(g_parsefile->pf_fd, buf, IBUFSIZ - 1, /*loop_on_EINTR:*/ 1);
+		nr = nonblock_immune_read(g_parsefile->pf_fd, buf, IBUFSIZ - 1);
 	else {
 		int timeout = -1;
 # if ENABLE_ASH_IDLE_TIMEOUT
@@ -12868,21 +12868,11 @@ readcmd(int argc UNUSED_PARAM, char **argv UNUSED_PARAM)
 }
 
 static int FAST_FUNC
-umaskcmd(int argc UNUSED_PARAM, char **argv)
+umaskcmd(int argc UNUSED_PARAM, char **argv UNUSED_PARAM)
 {
-	static const char permuser[3] ALIGN1 = "ugo";
-	static const char permmode[3] ALIGN1 = "rwx";
-	static const short permmask[] ALIGN2 = {
-		S_IRUSR, S_IWUSR, S_IXUSR,
-		S_IRGRP, S_IWGRP, S_IXGRP,
-		S_IROTH, S_IWOTH, S_IXOTH
-	};
+	static const char permuser[3] ALIGN1 = "ogu";
 
-	/* TODO: use bb_parse_mode() instead */
-
-	char *ap;
 	mode_t mask;
-	int i;
 	int symbolic_mode = 0;
 
 	while (nextopt("S") != '\0') {
@@ -12894,45 +12884,43 @@ umaskcmd(int argc UNUSED_PARAM, char **argv)
 	umask(mask);
 	INT_ON;
 
-	ap = *argptr;
-	if (ap == NULL) {
+	if (*argptr == NULL) {
 		if (symbolic_mode) {
-			char buf[18];
+			char buf[sizeof(",u=rwx,g=rwx,o=rwx")];
 			char *p = buf;
+			int i;
 
-			for (i = 0; i < 3; i++) {
-				int j;
-
+			i = 2;
+			for (;;) {
+				*p++ = ',';
 				*p++ = permuser[i];
 				*p++ = '=';
-				for (j = 0; j < 3; j++) {
-					if ((mask & permmask[3 * i + j]) == 0) {
-						*p++ = permmode[j];
-					}
-				}
-				*p++ = ',';
+				/* mask is 0..0uuugggooo. i=2 selects uuu bits */
+				if (!(mask & 0400)) *p++ = 'r';
+				if (!(mask & 0200)) *p++ = 'w';
+				if (!(mask & 0100)) *p++ = 'x';
+				mask <<= 3;
+				if (--i < 0)
+					break;
 			}
-			*--p = 0;
-			puts(buf);
+			*p = '\0';
+			puts(buf + 1);
 		} else {
-			out1fmt("%.4o\n", mask);
+			out1fmt("%04o\n", mask);
 		}
 	} else {
-		if (isdigit((unsigned char) *ap)) {
-			mask = 0;
-			do {
-				if (*ap >= '8' || *ap < '0')
-					ash_msg_and_raise_error(msg_illnum, argv[1]);
-				mask = (mask << 3) + (*ap - '0');
-			} while (*++ap != '\0');
-			umask(mask);
-		} else {
-			mask = ~mask & 0777;
-			if (!bb_parse_mode(ap, &mask)) {
-				ash_msg_and_raise_error("illegal mode: %s", ap);
-			}
-			umask(~mask & 0777);
+		char *modestr = *argptr;
+                /* numeric umasks are taken as-is */
+                /* symbolic umasks are inverted: "umask a=rx" calls umask(222) */
+		if (!isdigit(modestr[0]))
+			mask ^= 0777;
+		mask = bb_parse_mode(modestr, mask);
+		if ((unsigned)mask > 0777) {
+			ash_msg_and_raise_error("illegal mode: %s", modestr);
 		}
+		if (!isdigit(modestr[0]))
+			mask ^= 0777;
+		umask(mask);
 	}
 	return 0;
 }
