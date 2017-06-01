@@ -14,7 +14,9 @@ LOCAL_CFLAGS := -Wno-sign-compare
 LOCAL_MODULE := libclearsilverregex
 
 LOCAL_CFLAGS += -DANDROID_PLATFORM_SDK_VERSION=$(PLATFORM_SDK_VERSION)
-
+ifeq ($(shell test $(PLATFORM_SDK_VERSION) -ge 26 && echo OK),OK)
+LOCAL_PROPRIETARY_MODULE := true
+endif
 
 include $(BUILD_STATIC_LIBRARY)
 
@@ -26,7 +28,9 @@ LOCAL_MODULE := libuclibcrpc
 LOCAL_CFLAGS += -fno-strict-aliasing
 
 LOCAL_CFLAGS += -DANDROID_PLATFORM_SDK_VERSION=$(PLATFORM_SDK_VERSION)
-
+ifeq ($(shell test $(PLATFORM_SDK_VERSION) -ge 26 && echo OK),OK)
+LOCAL_PROPRIETARY_MODULE := true
+endif
 
 ifeq ($(BIONIC_L),true)
 LOCAL_CFLAGS += -DBIONIC_ICS -DBIONIC_L
@@ -98,7 +102,9 @@ LOCAL_MODULE := busybox_prepare
 LOCAL_MODULE_TAGS := eng debug
 
 LOCAL_CFLAGS += -DANDROID_PLATFORM_SDK_VERSION=$(PLATFORM_SDK_VERSION)
-
+ifeq ($(shell test $(PLATFORM_SDK_VERSION) -ge 26 && echo OK),OK)
+LOCAL_PROPRIETARY_MODULE := true
+endif
 #include $(BUILD_STATIC_LIBRARY)
 
 #####################################################################
@@ -193,7 +199,9 @@ LOCAL_STATIC_LIBRARIES := libcutils libc libm libselinux
 LOCAL_ADDITIONAL_DEPENDENCIES := $(busybox_prepare_minimal)
 
 LOCAL_CFLAGS += -DANDROID_PLATFORM_SDK_VERSION=$(PLATFORM_SDK_VERSION)
-
+ifeq ($(shell test $(PLATFORM_SDK_VERSION) -ge 26 && echo OK),OK)
+LOCAL_PROPRIETARY_MODULE := true
+endif
 
 include $(BUILD_STATIC_LIBRARY)
 
@@ -218,8 +226,12 @@ LOCAL_STATIC_LIBRARIES += libclearsilverregex libuclibcrpc libselinux
 LOCAL_ADDITIONAL_DEPENDENCIES := $(busybox_prepare_full)
 
 LOCAL_CFLAGS += -DANDROID_PLATFORM_SDK_VERSION=$(PLATFORM_SDK_VERSION)
-
+ifeq ($(shell test $(PLATFORM_SDK_VERSION) -ge 26 && echo OK),OK)
+LOCAL_PROPRIETARY_MODULE := true
+LOCAL_MODULE_PATH := $(TARGET_OUT_VENDOR)/xbin
+else
 LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
+endif
 
 include $(BUILD_EXECUTABLE)
 
@@ -227,9 +239,11 @@ BUSYBOX_LINKS := $(shell cat $(BB_PATH)/busybox-$(BUSYBOX_CONFIG).links)
 # nc is provided by external/netcat
 exclude := nc which
 
-
+ifeq ($(shell test $(PLATFORM_SDK_VERSION) -ge 26 && echo OK),OK)
+SYMLINKS := $(addprefix $(TARGET_OUT_VENDOR)/xbin/,$(filter-out $(exclude),$(notdir $(BUSYBOX_LINKS))))
+else
 SYMLINKS := $(addprefix $(TARGET_OUT_OPTIONAL_EXECUTABLES)/,$(filter-out $(exclude),$(notdir $(BUSYBOX_LINKS))))
-
+endif
 
 $(SYMLINKS): BUSYBOX_BINARY := $(LOCAL_MODULE)
 $(SYMLINKS): $(LOCAL_INSTALLED_MODULE)
@@ -276,5 +290,7 @@ LOCAL_UNSTRIPPED_PATH := $(PRODUCT_OUT)/symbols/utilities
 LOCAL_ADDITIONAL_DEPENDENCIES := $(busybox_prepare_full)
 
 LOCAL_CFLAGS += -DANDROID_PLATFORM_SDK_VERSION=$(PLATFORM_SDK_VERSION)
-
+ifeq ($(shell test $(PLATFORM_SDK_VERSION) -ge 26 && echo OK),OK)
+LOCAL_PROPRIETARY_MODULE := true
+endif
 include $(BUILD_EXECUTABLE)
