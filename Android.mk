@@ -12,6 +12,10 @@ LOCAL_SRC_FILES := android/regex/bb_regex.c
 LOCAL_C_INCLUDES := $(BB_PATH)/android/regex
 LOCAL_CFLAGS := -Wno-sign-compare
 LOCAL_MODULE := libclearsilverregex
+
+LOCAL_CFLAGS += -DANDROID_PLATFORM_SDK_VERSION=$(PLATFORM_SDK_VERSION)
+
+
 include $(BUILD_STATIC_LIBRARY)
 
 # Make a static library for RPC library (coming from uClibc).
@@ -20,6 +24,10 @@ LOCAL_SRC_FILES := $(shell cat $(BB_PATH)/android/librpc.sources)
 LOCAL_C_INCLUDES := $(BB_PATH)/android/librpc
 LOCAL_MODULE := libuclibcrpc
 LOCAL_CFLAGS += -fno-strict-aliasing
+
+LOCAL_CFLAGS += -DANDROID_PLATFORM_SDK_VERSION=$(PLATFORM_SDK_VERSION)
+
+
 ifeq ($(BIONIC_L),true)
 LOCAL_CFLAGS += -DBIONIC_ICS -DBIONIC_L
 endif
@@ -88,6 +96,9 @@ $(BUSYBOX_CONFIG):
 busybox_prepare: $(BUSYBOX_CONFIG)
 LOCAL_MODULE := busybox_prepare
 LOCAL_MODULE_TAGS := eng debug
+
+LOCAL_CFLAGS += -DANDROID_PLATFORM_SDK_VERSION=$(PLATFORM_SDK_VERSION)
+
 #include $(BUILD_STATIC_LIBRARY)
 
 #####################################################################
@@ -99,12 +110,21 @@ KERNEL_MODULES_DIR ?= /system/lib/modules
 
 SUBMAKE := make -s -C $(BB_PATH) CC=$(CC)
 
-
+ifeq ($(shell test $(PLATFORM_SDK_VERSION) -ge 26 && echo OK),OK)
 BUSYBOX_SRC_FILES = \
 	$(shell cat $(BB_PATH)/busybox-$(BUSYBOX_CONFIG).sources) \
 	android/libc/mktemp.c \
 	android/libc/pty.c \
+	shell/ash_80.c \
 	android/android.c
+else
+BUSYBOX_SRC_FILES = \
+	$(shell cat $(BB_PATH)/busybox-$(BUSYBOX_CONFIG).sources) \
+	android/libc/mktemp.c \
+	android/libc/pty.c \
+	shell/ash.c \
+	android/android.c
+endif
 
 BUSYBOX_ASM_FILES =
 ifneq ($(BIONIC_L),true)
@@ -171,6 +191,10 @@ LOCAL_MODULE_TAGS := eng debug
 #$(LOCAL_MODULE): busybox_prepare
 LOCAL_STATIC_LIBRARIES := libcutils libc libm libselinux
 LOCAL_ADDITIONAL_DEPENDENCIES := $(busybox_prepare_minimal)
+
+LOCAL_CFLAGS += -DANDROID_PLATFORM_SDK_VERSION=$(PLATFORM_SDK_VERSION)
+
+
 include $(BUILD_STATIC_LIBRARY)
 
 
@@ -187,17 +211,26 @@ LOCAL_CFLAGS := $(BUSYBOX_CFLAGS)
 LOCAL_ASFLAGS := $(BUSYBOX_AFLAGS)
 LOCAL_MODULE := busybox
 LOCAL_MODULE_TAGS := eng debug
-LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
+
 LOCAL_SHARED_LIBRARIES := libc libcutils libm
 #$(LOCAL_MODULE): busybox_prepare
 LOCAL_STATIC_LIBRARIES += libclearsilverregex libuclibcrpc libselinux
 LOCAL_ADDITIONAL_DEPENDENCIES := $(busybox_prepare_full)
+
+LOCAL_CFLAGS += -DANDROID_PLATFORM_SDK_VERSION=$(PLATFORM_SDK_VERSION)
+
+LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
+
 include $(BUILD_EXECUTABLE)
 
 BUSYBOX_LINKS := $(shell cat $(BB_PATH)/busybox-$(BUSYBOX_CONFIG).links)
 # nc is provided by external/netcat
 exclude := nc which
+
+
 SYMLINKS := $(addprefix $(TARGET_OUT_OPTIONAL_EXECUTABLES)/,$(filter-out $(exclude),$(notdir $(BUSYBOX_LINKS))))
+
+
 $(SYMLINKS): BUSYBOX_BINARY := $(LOCAL_MODULE)
 $(SYMLINKS): $(LOCAL_INSTALLED_MODULE)
 	@echo -e ${CL_CYN}"Symlink:"${CL_RST}" $@ -> $(BUSYBOX_BINARY)"
@@ -241,4 +274,7 @@ LOCAL_MODULE_PATH := $(PRODUCT_OUT)/utilities
 LOCAL_UNSTRIPPED_PATH := $(PRODUCT_OUT)/symbols/utilities
 #$(LOCAL_MODULE): busybox_prepare
 LOCAL_ADDITIONAL_DEPENDENCIES := $(busybox_prepare_full)
+
+LOCAL_CFLAGS += -DANDROID_PLATFORM_SDK_VERSION=$(PLATFORM_SDK_VERSION)
+
 include $(BUILD_EXECUTABLE)

@@ -89,7 +89,11 @@ char *hasmntopt(const struct mntent *mnt, const char *opt)
 
 /* declared in grp.h, but not necessary */
 #if !ENABLE_USE_BB_PWD_GRP
+
+#if ANDROID_PLATFORM_SDK_VERSION < 26 //8.0
 int setpwent() { return 0; }
+#endif
+
 void setgrent() {}
 void endgrent() {}
 #endif

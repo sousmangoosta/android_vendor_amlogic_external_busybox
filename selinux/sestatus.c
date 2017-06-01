@@ -160,6 +160,17 @@ static void display_verbose(void)
 	}
 }
 
+#if ANDROID_PLATFORM_SDK_VERSION >= 26 //8.0
+int selinux_getenforcemode(int *rc)
+{
+	if (rc) {
+		*rc = security_getenforce();
+		return 0;
+	}
+	return -1;
+}
+#endif
+
 int sestatus_main(int argc, char **argv) MAIN_EXTERNALLY_VISIBLE;
 int sestatus_main(int argc UNUSED_PARAM, char **argv)
 {

@@ -179,6 +179,11 @@
 # define XTABS TAB3
 #endif
 
+#if ANDROID_PLATFORM_SDK_VERSION >= 26 //8.0
+struct res_state;
+extern struct __res_state *__res_state(void);
+#define _res (*__res_state())
+#endif
 
 /* Some libc's forget to declare these, do it ourself */
 
