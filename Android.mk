@@ -160,7 +160,7 @@ BUSYBOX_CFLAGS = \
 	-DANDROID \
 	-fno-strict-aliasing \
 	-fno-builtin-stpcpy \
-	-include $(bb_gen)/$(BUSYBOX_CONFIG)/include/autoconf.h \
+	-include $(BB_PATH)/$(BUSYBOX_CONFIG)/include/autoconf.h \
 	-D'CONFIG_DEFAULT_MODULES_DIR="$(KERNEL_MODULES_DIR)"' \
 	-D'BB_VER="$(strip $(shell $(SUBMAKE) kernelversion)) $(BUSYBOX_SUFFIX)"' -DBB_BT=AUTOCONF_TIMESTAMP
 
@@ -181,7 +181,7 @@ endif
 BUSYBOX_CONFIG:=minimal
 BUSYBOX_SUFFIX:=static
 LOCAL_SRC_FILES := $(BUSYBOX_SRC_FILES)
-LOCAL_C_INCLUDES := $(bb_gen)/minimal/include $(BUSYBOX_C_INCLUDES)
+LOCAL_C_INCLUDES := $(BB_PATH)/minimal/include $(BUSYBOX_C_INCLUDES)
 LOCAL_CFLAGS := -Dmain=busybox_driver $(BUSYBOX_CFLAGS)
 LOCAL_CFLAGS += \
   -DRECOVERY_VERSION \
@@ -214,7 +214,7 @@ include $(CLEAR_VARS)
 BUSYBOX_CONFIG:=full
 BUSYBOX_SUFFIX:=bionic
 LOCAL_SRC_FILES := $(BUSYBOX_SRC_FILES)
-LOCAL_C_INCLUDES := $(bb_gen)/full/include $(BUSYBOX_C_INCLUDES)
+LOCAL_C_INCLUDES := $(BB_PATH)/full/include $(BUSYBOX_C_INCLUDES)
 LOCAL_CFLAGS := $(BUSYBOX_CFLAGS)
 LOCAL_ASFLAGS := $(BUSYBOX_AFLAGS)
 LOCAL_MODULE := busybox
@@ -268,7 +268,7 @@ include $(CLEAR_VARS)
 BUSYBOX_CONFIG:=full
 BUSYBOX_SUFFIX:=static
 LOCAL_SRC_FILES := $(BUSYBOX_SRC_FILES)
-LOCAL_C_INCLUDES := $(bb_gen)/full/include $(BUSYBOX_C_INCLUDES)
+LOCAL_C_INCLUDES := $(BB_PATH)/full/include $(BUSYBOX_C_INCLUDES)
 LOCAL_CFLAGS := $(BUSYBOX_CFLAGS)
 LOCAL_CFLAGS += \
   -Dgetusershell=busybox_getusershell \
