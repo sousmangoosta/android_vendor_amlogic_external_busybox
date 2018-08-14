@@ -195,7 +195,7 @@ LOCAL_ASFLAGS := $(BUSYBOX_AFLAGS)
 LOCAL_MODULE := libbusybox
 LOCAL_MODULE_TAGS := eng debug
 #$(LOCAL_MODULE): busybox_prepare
-LOCAL_STATIC_LIBRARIES := libcutils libc libm libselinux
+LOCAL_STATIC_LIBRARIES := libcutils libselinux
 LOCAL_ADDITIONAL_DEPENDENCIES := $(busybox_prepare_minimal)
 
 LOCAL_CFLAGS += -DANDROID_PLATFORM_SDK_VERSION=$(PLATFORM_SDK_VERSION)
@@ -220,7 +220,7 @@ LOCAL_ASFLAGS := $(BUSYBOX_AFLAGS)
 LOCAL_MODULE := busybox
 LOCAL_MODULE_TAGS := eng debug
 
-LOCAL_SHARED_LIBRARIES := libc libcutils libm
+LOCAL_SHARED_LIBRARIES := libcutils
 #$(LOCAL_MODULE): busybox_prepare
 LOCAL_STATIC_LIBRARIES += libclearsilverregex libuclibcrpc libselinux
 LOCAL_ADDITIONAL_DEPENDENCIES := $(busybox_prepare_full)
@@ -278,11 +278,11 @@ LOCAL_CFLAGS += \
   -Dgetmntent_r=busybox_getmntent_r \
   -Dgenerate_uuid=busybox_generate_uuid
 LOCAL_ASFLAGS := $(BUSYBOX_AFLAGS)
-LOCAL_FORCE_STATIC_EXECUTABLE := true
+# LOCAL_FORCE_STATIC_EXECUTABLE := true
 LOCAL_MODULE := static_busybox
 LOCAL_MODULE_STEM := busybox
 LOCAL_MODULE_TAGS := optional
-LOCAL_STATIC_LIBRARIES := libclearsilverregex libc libcutils libm libuclibcrpc libselinux
+LOCAL_STATIC_LIBRARIES := libclearsilverregex libcutils libuclibcrpc libselinux
 LOCAL_MODULE_CLASS := EXECUTABLES
 LOCAL_MODULE_PATH := $(PRODUCT_OUT)/utilities
 LOCAL_UNSTRIPPED_PATH := $(PRODUCT_OUT)/symbols/utilities
