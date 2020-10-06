@@ -99,7 +99,7 @@ $(BUSYBOX_CONFIG):
 
 busybox_prepare: $(BUSYBOX_CONFIG)
 LOCAL_MODULE := busybox_prepare
-LOCAL_MODULE_TAGS := eng debug
+#LOCAL_MODULE_TAGS := eng debug
 
 LOCAL_CFLAGS += -DANDROID_PLATFORM_SDK_VERSION=$(PLATFORM_SDK_VERSION)
 ifeq ($(shell test $(PLATFORM_SDK_VERSION) -ge 26 && echo OK),OK)
@@ -193,7 +193,7 @@ LOCAL_CFLAGS += \
   -Dgenerate_uuid=busybox_generate_uuid
 LOCAL_ASFLAGS := $(BUSYBOX_AFLAGS)
 LOCAL_MODULE := libbusybox
-LOCAL_MODULE_TAGS := eng debug
+#LOCAL_MODULE_TAGS := eng debug
 #$(LOCAL_MODULE): busybox_prepare
 LOCAL_STATIC_LIBRARIES := libcutils libselinux
 LOCAL_ADDITIONAL_DEPENDENCIES := $(busybox_prepare_minimal)
@@ -218,7 +218,7 @@ LOCAL_C_INCLUDES := $(BB_PATH)/full/include $(BUSYBOX_C_INCLUDES)
 LOCAL_CFLAGS := $(BUSYBOX_CFLAGS)
 LOCAL_ASFLAGS := $(BUSYBOX_AFLAGS)
 LOCAL_MODULE := busybox
-LOCAL_MODULE_TAGS := eng debug
+#LOCAL_MODULE_TAGS := eng debug
 
 LOCAL_SHARED_LIBRARIES := libcutils
 #$(LOCAL_MODULE): busybox_prepare
