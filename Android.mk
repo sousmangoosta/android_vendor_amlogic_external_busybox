@@ -97,6 +97,7 @@ $(BUSYBOX_CONFIG):
 	@rm $(BB_PATH)/include/autoconf.h
 	@rm -f $(BB_PATH)/.config-old
 
+.PHONY: busybox_prepare
 busybox_prepare: $(BUSYBOX_CONFIG)
 LOCAL_MODULE := busybox_prepare
 #LOCAL_MODULE_TAGS := eng debug
