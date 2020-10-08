@@ -84,6 +84,7 @@ $(busybox_prepare_minimal): $(BB_PATH)/busybox-minimal.config
 
 KERNEL_MODULES_DIR ?= /system/lib/modules
 BUSYBOX_CONFIG := minimal full
+.PHONY: $(BUSYBOX_CONFIG)
 $(BUSYBOX_CONFIG):
 	@echo -e ${CL_PFX}"prepare config for busybox $@ profile"${CL_RST}
 	@cd $(BB_PATH) && make clean
