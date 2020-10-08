@@ -62,7 +62,7 @@ ifeq ($(HOST_OS),darwin)
 endif
 
 # On aosp (master), path is relative, not on cm (kitkat)
-bb_gen := $(abspath $(TARGET_OUT_INTERMEDIATES)/busybox)
+bb_gen := $(TARGET_OUT_INTERMEDIATES)/busybox
 
 busybox_prepare_full := $(bb_gen)/full/.config
 $(busybox_prepare_full): $(BB_PATH)/busybox-full.config
