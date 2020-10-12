@@ -67,11 +67,11 @@ bb_gen := $(TARGET_OUT_INTERMEDIATES)/busybox
 busybox_prepare_full := $(bb_gen)/full/.config
 $(busybox_prepare_full): $(BB_PATH)/busybox-full.config
 	@echo -e ${CL_YLW}"Prepare config for busybox binary"${CL_RST}
-	@rm -rf $(bb_gen)/full
+	@rm -rf $(abspath $(bb_gen)/full)
 	@rm -f $(addsuffix /*.o, $(abspath $(call intermediates-dir-for,EXECUTABLES,busybox)))
-	@mkdir -p $(@D)
-	@cat $^ > $@ && echo "CONFIG_CROSS_COMPILER_PREFIX=\"$(BUSYBOX_CROSS_COMPILER_PREFIX)\"" >> $@
-	$(MAKE) -C $(BB_PATH) prepare O=$(@D) $(BB_PREPARE_FLAGS)
+	@mkdir -p $(abspath $(@D))
+	@cat $^ > $(abspath $@) && echo "CONFIG_CROSS_COMPILER_PREFIX=\"$(BUSYBOX_CROSS_COMPILER_PREFIX)\"" >> $(abspath $@)
+	PATH=/bin $(MAKE) -C $(BB_PATH) prepare O=$(abspath $(@D)) $(BB_PREPARE_FLAGS)
 
 busybox_prepare_minimal := $(bb_gen)/minimal/.config
 $(busybox_prepare_minimal): $(BB_PATH)/busybox-minimal.config
@@ -80,7 +80,7 @@ $(busybox_prepare_minimal): $(BB_PATH)/busybox-minimal.config
 	@rm -f $(addsuffix /*.o, $(abspath $(call intermediates-dir-for,STATIC_LIBRARIES,libbusybox)))
 	@mkdir -p $(@D)
 	@cat $^ > $@ && echo "CONFIG_CROSS_COMPILER_PREFIX=\"$(BUSYBOX_CROSS_COMPILER_PREFIX)\"" >> $@
-	$(MAKE) -C $(BB_PATH) prepare O=$(@D) $(BB_PREPARE_FLAGS)
+	PATH=/bin $(MAKE) -C $(BB_PATH) prepare O=$(@D) $(BB_PREPARE_FLAGS)
 
 KERNEL_MODULES_DIR ?= /system/lib/modules
 BUSYBOX_CONFIG := minimal full
@@ -90,7 +90,7 @@ $(BUSYBOX_CONFIG):
 	@cd $(BB_PATH) && make clean
 	@cd $(BB_PATH) && git clean -f -- ./include-$@/
 	cp $(BB_PATH)/.config-$@ $(BB_PATH)/.config
-	cd $(BB_PATH) && make prepare
+	cd $(BB_PATH) && PATH=/bin make prepare
 	@#cp $(BB_PATH)/.config $(BB_PATH)/.config-$@
 	@mkdir -p $(BB_PATH)/include-$@
 	cp $(BB_PATH)/include/*.h $(BB_PATH)/include-$@/
@@ -164,7 +164,7 @@ BUSYBOX_CFLAGS = \
 	-fno-builtin-stpcpy \
 	-include $(BB_PATH)/$(BUSYBOX_CONFIG)/include/autoconf.h \
 	-D'CONFIG_DEFAULT_MODULES_DIR="$(KERNEL_MODULES_DIR)"' \
-	-D'BB_VER="$(strip $(shell $(SUBMAKE) kernelversion)) $(BUSYBOX_SUFFIX)"' -DBB_BT=AUTOCONF_TIMESTAMP
+	-D'BB_VER="$(strip $(shell PATH=/bin $(SUBMAKE) kernelversion)) $(BUSYBOX_SUFFIX)"' -DBB_BT=AUTOCONF_TIMESTAMP
 
 ifeq ($(BIONIC_L),true)
     BUSYBOX_CFLAGS += -DBIONIC_L
